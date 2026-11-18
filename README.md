@@ -3,52 +3,52 @@
 # 🚗 Ξ Proyecto Xi | Predicción de Precios de Autos Usados (Rusty Bargain)
 
 ## 📋 Descripción
-**Rusty Bargain** desea desarrollar una aplicación capaz de estimar el valor de mercado de vehículos usados a partir de sus características técnicas. El objetivo principal de este proyecto consiste en construir y comparar múltiples modelos de **Machine Learning** que proporcionen predicciones altamente precisas manteniendo tiempos de entrenamiento e inferencia razonables para una futura implementación en producción.
+El servicio de venta de autos usados **Rusty Bargain** está desarrollando una aplicación para atraer nuevos clientes permitiéndoles averiguar rápidamente el valor de mercado de su coche a partir de sus especificaciones técnicas y equipamiento. 
 
-Para lograrlo, se desarrolló un flujo completo de ciencia de datos que abarcó limpieza profunda, tratamiento de valores ausentes, ingeniería de características (codificación *One-Hot* y manejo nativo de categorías) y optimización de algoritmos basados en *Gradient Boosting* evaluados mediante la métrica **RECM (RMSE)**.
+El objetivo principal de este proyecto consiste en construir y comparar modelos de **Machine Learning** evaluando tres criterios fundamentales para el negocio:
+1. **Calidad de la predicción** (medida mediante **RECM / RMSE**).
+2. **Tiempo requerido para el entrenamiento**.
+3. **Velocidad de inferencia (predicción)**.
 
 ## 🎯 Objetivos
-- ✅ Realizar exploración, limpieza de anomalías y tratamiento de valores ausentes en el historial de vehículos usados.
-- ✅ Aplicar técnicas de codificación adecuadas según el algoritmo (**One-Hot Encoding** vs. tipo nativo `category`).
-- ✅ Entrenar y comparar modelos lineales, basados en árboles y ensambles avanzados (**Random Forest, CatBoost, XGBoost y LightGBM**).
-- ✅ Evaluar el equilibrio entre calidad predictiva (**RMSE**) y eficiencia computacional (tiempos de entrenamiento e inferencia).
-- ✅ Seleccionar el modelo óptimo listo para producción.
+- ✅ Explorar y depurar el historial de 354,369 vehículos usados, filtrando rangos anómalos de año de registro (`1900–2016`) y potencia (`45–500 CV`), e imputando valores ausentes en variables categóricas (`unknown`).
+- ✅ Preparar los datos con técnicas de codificación adecuadas según cada algoritmo (**One-Hot Encoding**, **OrdinalEncoder** y tipo nativo `category`).
+- ✅ Entrenar y comparar una prueba de cordura (**Regresión Lineal**), **Bosque Aleatorio (Random Forest)** y **LightGBM**.
+- ✅ Evaluar el equilibrio entre precisión predictiva (**RECM**) y tiempos de cómputo (entrenamiento y predicción).
+- ✅ Seleccionar el modelo óptimo para implementar en la aplicación de **Rusty Bargain**.
 
 ## 🛠️ Herramientas y Habilidades Utilizadas
 * **Lenguaje:** Python
-* **Librerías:** Pandas, NumPy, Scikit-Learn, LightGBM, CatBoost, XGBoost, Matplotlib y Seaborn
-* **Entorno:** Jupyter Notebook ([Proyecto_Xi_Prediccion_Precios_Autos_Usados.ipynb](https://github.com/santidata7/Xi_Used_Car_Price_Prediction/blob/main/Proyecto_Xi_Prediccion_Precios_Autos_Usados.ipynb))
-* **Técnicas:** Limpieza y curaduría de datos, One-Hot Encoding (OHE), Manejo nativo de variables categóricas, Gradient Boosting, Ajuste de hiperparámetros y Evaluación de tiempos de ejecución.
+* **Librerías:** Pandas, NumPy, Scikit-Learn y LightGBM
+* **Entorno:** Jupyter Notebook (`Proyecto_Xi_Prediccion_Precios_Autos_Usados.ipynb`)
+* **Técnicas:** Limpieza y filtrado de anomalías, One-Hot Encoding (OHE), Ordinal Encoding, Manejo nativo de variables categóricas (`category`), GridSearchCV, Gradient Boosting y Perfilado de tiempos (`%%time`).
 
 ## 📊 Fuente de Datos y Variables
-El conjunto de datos (`car_data.7z`) contiene registros históricos de vehículos usados con las siguientes variables principales:
-* **Características técnicas y de uso:** `VehicleType` (tipo de vehículo), `Brand` (marca), `Model` (modelo), `Gearbox` (caja de cambios), `Power` (potencia), `FuelType` (tipo de combustible), `Kilometer` (kilometraje) y `NotRepaired` (estado de reparación).
+El conjunto de datos original (`car_data.csv` / `car_data.7z`) cuenta con **354,369 registros** y 16 columnas. Tras depurar registros corruptos o irreales, se trabajó con un dataset limpio de **300,243 vehículos** y las siguientes características relevantes:
+* **Características técnicas y de uso:** `VehicleType` (tipo de vehículo), `Brand` (marca), `Model` (modelo), `Gearbox` (caja de cambios), `Power` (potencia en CV), `FuelType` (combustible), `Mileage` (kilometraje) y `NotRepaired` (estado de reparación).
 * **Variables temporales:** `RegistrationYear` (año de registro) y `RegistrationMonth` (mes de registro).
 * **Variable objetivo:** `Price` (valor de mercado en euros).
 
 ## ⚙️ Metodología
-1. **Preparación y Limpieza de Datos:** Tratamiento de valores ausentes, corrección de inconsistencias, eliminación de registros anómalos (años de registro o potencias irreales) y conversión de tipos de datos.
-2. **División de Datos:** Partición estructurada en conjuntos de **Entrenamiento**, **Validación** y **Prueba** para evitar fuga de datos (*data leakage*).
-3. **Ingeniería de Características:** Implementación de **One-Hot Encoding (OHE)** para modelos tradicionales y aprovechamiento del procesamiento nativo mediante el tipo de dato `category` para **LightGBM** y **CatBoost**.
-4. **Entrenamiento y Benchmark:** Evaluación sistemática de modelos midiendo tanto el error cuadrático medio (**RMSE**) como el tiempo de cómputo.
+1. **Preparación y Limpieza de Datos:** Filtrado de valores imposibles en `RegistrationYear` y `Power` (conservando ~85% de los registros válidos), imputación de valores nulos categóricos como `'unknown'` y eliminación de columnas irrelevantes (`DateCrawled`, `DateCreated`, `LastSeen`, `NumberOfPictures`, `PostalCode`).
+2. **División de Datos:** Partición **75% Entrenamiento / 25% Validación** (`random_state=42`).
+3. **Preprocesamiento Específico por Modelo:**
+   * **Regresión Lineal:** Codificación *One-Hot* (`pd.get_dummies`).
+   * **Bosque Aleatorio:** Codificación ordinal (`OrdinalEncoder`) y optimización de hiperparámetros mediante `GridSearchCV` (`cv=3`).
+   * **LightGBM:** Conversión directa de columnas categóricas al tipo nativo `category` y evaluación de múltiples combinaciones de hiperparámetros.
 
 ## 💡 Comparación de Resultados y Tiempos de Ejecución
-| Modelo Evaluado | RMSE (RECM) | Tiempo Aproximado | Observaciones |
-| :--- | :---: | :---: | :--- |
-| **Regresor Ficticio (Dummy)** | 4,562.24 € | — | Línea base mínima de referencia |
-| **Regresión Lineal** | 2,554.63 € | — | Primer modelo predictivo base |
-| **Árbol de Decisión** | 1,746.37 € | — | Primer modelo no lineal evaluado |
-| **Bosque Aleatorio (Random Forest)** | 1,594.89 € | ~6 min | Buen desempeño, alto costo temporal |
-| **CatBoost** | 1,523.59 € | ~13 min 18 s | Alta precisión con categorías nativas |
-| **XGBoost** | 1,502.43 € | ~44.8 s | Regularización avanzada y rápida ejecución |
-| **LightGBM (Seleccionado)** | **1,492.74 €** | **~25.8 s** | **Mejor precisión y máxima eficiencia** |
+| Modelo Evaluado | Codificación | RECM (RMSE) | Tiempo Entrenamiento | Tiempo Predicción |
+| :--- | :---: | :---: | :---: | :---: |
+| **Regresión Lineal (Prueba de cordura)** | One-Hot (OHE) | 2,606.30 € | 8.47 s | **220 ms** |
+| **Bosque Aleatorio (`max_depth=15, n_estimators=100`)** | OrdinalEncoder | 1,695.17 € | 18.60 s *(2m 37s GridSearch)* | 509 ms |
+| **LightGBM (`n_estimators=100, lr=0.05, num_leaves=63`)** | Nativa (`category`) | **1,683.67 €** | **3.11 s** | 369 ms |
 
 ### ⚙️ Configuración del Modelo Ganador (`LightGBM`)
 ```python
 LGBMRegressor(
-    random_state=12,
-    n_estimators=2000,
-    max_depth=20,
-    min_samples_leaf=5,
-    learning_rate=0.1
+    n_estimators=100,
+    learning_rate=0.05,
+    num_leaves=63,
+    random_state=42
 )
